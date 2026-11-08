@@ -1,0 +1,2 @@
+Synthesized with facebook/mms-tts-ben (CC-BY-NC 4.0) by lab/va_lab/bangla_voice.py.
+Replace any file with a human recording of the same name; it will be kept.

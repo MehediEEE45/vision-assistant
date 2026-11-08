@@ -1,0 +1,60 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "env": {
+      "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr",
+      "ANDROID_HOME": "${env:LOCALAPPDATA}\\Android\\Sdk"
+    }
+  },
+  "presentation": {
+    "panel": "dedicated",
+    "clear": true
+  },
+  "tasks": [
+    {
+      "label": "Run on device",
+      "detail": "Build, install and launch on whatever device adb can see.",
+      "type": "shell",
+      "command": ".\\gradlew.bat :app:installDebug; if ($?) { & \"$env:LOCALAPPDATA\\Android\\Sdk\\platform-tools\\adb.exe\" shell am start -n bd.visionassistant.debug/bd.visionassistant.MainActivity }",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Pixel 4 XL emulator",
+      "detail": "Opens in its own window. VS Code cannot dock an emulator; only Android Studio can.",
+      "type": "shell",
+      "command": "& \"$env:LOCALAPPDATA\\Android\\Sdk\\emulator\\emulator.exe\" -avd Pixel_4_XL -gpu swiftshader_indirect",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Logcat",
+      "detail": "Live log, filtered to this app and any crash.",
+      "type": "shell",
+      "command": "& \"$env:LOCALAPPDATA\\Android\\Sdk\\platform-tools\\adb.exe\" logcat -v brief | Select-String -Pattern 'visionassistant|AndroidRuntime|FATAL'",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Policy gates",
+      "detail": "checkArchitecture + checkSafetyLanguage. Seconds, and they guard the invariants that matter.",
+      "type": "shell",
+      "command": ".\\gradlew.bat checkArchitecture checkSafetyLanguage",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unit tests",
+      "type": "shell",
+      "command": ".\\gradlew.bat test",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Devices",
+      "type": "shell",
+      "command": "& \"$env:LOCALAPPDATA\\Android\\Sdk\\platform-tools\\adb.exe\" devices -l",
+      "problemMatcher": []
+    }
+  ]
+}

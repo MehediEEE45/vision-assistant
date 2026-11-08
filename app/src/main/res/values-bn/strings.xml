@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  বাংলা। Primary language for this app's users, not an afterthought translation.
+
+  Keep sentences short. Every one of these is spoken while the user is walking,
+  and a long sentence delays the next warning.
+-->
+<resources>
+    <string name="app_name">ভিশন অ্যাসিস্ট্যান্ট</string>
+    <string name="channel_name">অ্যাসিস্ট্যান্ট চালু আছে</string>
+    <string name="service_running">বাধা ও নির্দেশের জন্য শুনছি।</string>
+
+    <string name="screen_is_one_button">বলার জন্য যেকোনো জায়গায় চাপুন। পাতা পড়তে দুইবার চাপুন। থামাতে দুই আঙুলে চাপুন। আবার শুনতে চেপে ধরুন।</string>
+
+    <string name="state_listening">শুনছি…</string>
+    <string name="state_reading">পড়ছি…</string>
+
+    <string name="obstacle_ahead">সামনে বাধা।</string>
+    <string name="obstacle_left">আপনার বাঁয়ে বাধা।</string>
+    <string name="obstacle_right">আপনার ডানে বাধা।</string>
+    <string name="obstacle_head_height">মাথার উচ্চতায় বাধা।</string>
+    <string name="step_down_ahead">সামনে ধাপ নিচে।</string>
+
+    <string name="wearable_disconnected">ডিভাইসের সংযোগ বিচ্ছিন্ন।</string>
+    <string name="wearable_degraded">সেন্সর থেকে তথ্য আসা বন্ধ হয়েছে। বাধার সতর্কতা কাজ করছে না।</string>
+    <string name="wearable_incompatible">এই ডিভাইসের সংস্করণ আলাদা। অনুগ্রহ করে হালনাগাদ করুন।</string>
+    <string name="wearable_battery_low">ডিভাইসের চার্জ পনেরো শতাংশের নিচে।</string>
+
+    <string name="fall_are_you_okay">আপনি কি ঠিক আছেন? হ্যাঁ বলুন, অথবা বোতাম চাপুন।</string>
+    <string name="sos_starting">জরুরি সাহায্য শুরু হচ্ছে। থামাতে বাতিল বলুন।</string>
+    <string name="sos_sent">আপনার অবস্থান পাঠানো হয়েছে। এখন কল করছি।</string>
+    <string name="sos_cancelled">জরুরি সাহায্য বাতিল হয়েছে।</string>
+
+    <string name="did_not_understand">আমি বুঝতে পারিনি। কী করতে পারি জানতে সাহায্য বলুন।</string>
+    <string name="not_built_yet">এটি এখনো তৈরি হয়নি।</string>
+    <string name="offline_limited">ইন্টারনেট নেই। তবুও বাধার সতর্কতা ও জরুরি কল কাজ করবে।</string>
+    <string name="permission_needed">ডিভাইসে সংযোগের জন্য ব্লুটুথ অনুমতি দরকার। অনুগ্রহ করে সেটিংসে অনুমতি দিন।</string>
+    <string name="confirmed">ঠিক আছে।</string>
+    <string name="language_now">এখন থেকে বাংলায় বলব।</string>
+    <string name="nothing_to_repeat">আবার বলার মতো কিছু নেই।</string>
+
+    <string name="mic_permission_needed">শোনার জন্য মাইক্রোফোনের অনুমতি দরকার। সেটিংসে অনুমতি দিন।</string>
+    <string name="asr_unavailable">এই ফোনে কথা বোঝার ব্যবস্থা নেই।</string>
+    <string name="did_not_hear">কিছু শুনতে পাইনি। আবার চাপুন।</string>
+    <string name="asr_network">কথা বুঝতে ইন্টারনেট সংযোগ দরকার।</string>
+    <string name="asr_failed">এখন শুনতে পারলাম না। আবার চাপুন।</string>
+
+    <string name="read_hold_steady">ফোনটি পাতার ওপরে ধরুন, স্থির রাখুন।</string>
+    <string name="read_camera_permission_needed">পড়ার জন্য ক্যামেরার অনুমতি দরকার। সেটিংসে অনুমতি দিন।</string>
+    <string name="read_capture_failed">ছবি তুলতে পারলাম না। আবার চেষ্টা করুন।</string>
+    <string name="read_no_text">পড়ার মতো লেখা পাইনি। বাংলা পাতা এখনো পড়তে পারি না।</string>
+    <string name="read_paused">থামানো হলো।</string>
+    <string name="read_finished">পড়া শেষ।</string>
+    <string name="read_nothing_open">কোনো পাতা খোলা নেই। পড়তে দুইবার চাপুন।</string>
+    <string name="read_open_app">পাতা পড়তে অ্যাপটি খুলুন।</string>
+
+    <string name="page_queued">পাতা তোলা হয়েছে। ইন্টারনেট এলে পড়ে শোনাবো।</string>
+</resources>

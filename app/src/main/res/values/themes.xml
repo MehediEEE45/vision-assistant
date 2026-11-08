@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      High contrast by default. Low-vision users are a large part of this
+      audience and the system contrast setting is not something to rely on.
+    -->
+    <style name="Theme.VisionAssistant" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/surface</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:statusBarColor">@color/surface</item>
+    </style>
+</resources>

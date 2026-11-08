@@ -1,0 +1,29 @@
+label,language,say,romanised,intent
+emergency_bn,bn,জরুরি,joruri,SOS
+stop_bn,bn,থামো,thamo,STOP
+repeat_bn,bn,আবার বলো,abar bolo,REPEAT
+ahead_bn,bn,সামনে কী,samne ki,WHAT_IS_AHEAD
+help_bn,bn,সাহায্য,shahajjo,HELP
+english_bn,bn,ইংরেজি,ingreji,LANGUAGE_ENGLISH
+battery,both,ব্যাটারি / battery,battery,BATTERY
+bangla,both,বাংলা / Bangla,bangla,LANGUAGE_BANGLA
+emergency_en,en,emergency,,SOS
+stop_en,en,stop,,STOP
+repeat_en,en,repeat,,REPEAT
+ahead_en,en,what is ahead,,WHAT_IS_AHEAD
+help_en,en,help,,HELP
+english_en,en,English,,LANGUAGE_ENGLISH
+person_bn,bn,মানুষ,manush,FIND_PERSON
+chair_bn,bn,চেয়ার,cheyar,FIND_CHAIR
+door_bn,bn,দরজা,dorja,FIND_DOOR
+table_bn,bn,টেবিল,tebil,FIND_TABLE
+bottle_bn,bn,বোতল,botol,FIND_BOTTLE
+toilet_bn,bn,টয়লেট,toylet,FIND_TOILET
+rickshaw,both,রিকশা / rickshaw,riksha,FIND_RICKSHAW
+cng,both,সিএনজি / CNG,si-en-ji,FIND_CNG
+person_en,en,person,,FIND_PERSON
+chair_en,en,chair,,FIND_CHAIR
+door_en,en,door,,FIND_DOOR
+table_en,en,table,,FIND_TABLE
+bottle_en,en,bottle,,FIND_BOTTLE
+toilet_en,en,toilet,,FIND_TOILET

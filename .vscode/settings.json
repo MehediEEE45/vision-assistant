@@ -1,0 +1,7 @@
+{
+  // The laptop lab's environment (torch + CUDA, YOLO, OCR, speech). Without
+  // this, VS Code's Run button uses the system Python, which has none of them.
+  "python.defaultInterpreterPath": "${env:USERPROFILE}\\.venvs\\vision-ai-lab\\Scripts\\python.exe",
+  "jupyter.kernels.excludePythonEnvironments": [],
+  "python.terminal.activateEnvironment": true
+}

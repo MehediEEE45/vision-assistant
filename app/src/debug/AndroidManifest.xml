@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!--
+          Debug builds only. Drives the voice and reading paths from adb, where
+          nobody can speak into the microphone or hold a page up to the camera.
+          Send with an explicit component, for example
+            adb shell am broadcast -n bd.visionassistant.debug/bd.visionassistant.DebugCommandReceiver
+              -a bd.visionassistant.debug.UTTERANCE with a string extra named text
+        -->
+        <receiver
+            android:name=".DebugCommandReceiver"
+            android:exported="true" />
+    </application>
+</manifest>

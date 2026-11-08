@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Rule for every string in this file and its translations: report what was
+  observed, never that an action is safe. "Traffic light detected ahead" is an
+  observation the user can act on with their own judgement; "it is safe to
+  cross" is a promise this system cannot keep.
+
+  Enforced by ./gradlew checkSafetyLanguage against banned-phrases.txt.
+-->
+<resources>
+    <string name="app_name">Vision Assistant</string>
+    <string name="channel_name">Assistant running</string>
+    <string name="service_running">Listening for obstacles and commands.</string>
+
+    <string name="screen_is_one_button">Tap anywhere to speak. Double tap to read a page. Two-finger tap to stop. Long press to repeat.</string>
+
+    <string name="state_listening">Listening…</string>
+    <string name="state_reading">Reading…</string>
+
+    <!-- Obstacles. Short on purpose: the haptic already told them where. -->
+    <string name="obstacle_ahead">Obstacle ahead.</string>
+    <string name="obstacle_left">Obstacle on your left.</string>
+    <string name="obstacle_right">Obstacle on your right.</string>
+    <string name="obstacle_head_height">Obstacle at head height.</string>
+    <string name="step_down_ahead">Step down ahead.</string>
+
+    <!-- Link health. Degradation is always spoken; it is never silent. -->
+    <string name="wearable_disconnected">Wearable disconnected.</string>
+    <string name="wearable_degraded">I have stopped receiving sensor data. Obstacle warnings are not working.</string>
+    <string name="wearable_incompatible">This wearable uses a different protocol version. Please update it.</string>
+    <string name="wearable_battery_low">Wearable battery below fifteen percent.</string>
+
+    <!-- Emergency. The countdown is always cancellable. -->
+    <string name="fall_are_you_okay">Are you okay? Say yes, or press the button.</string>
+    <string name="sos_starting">Emergency starting. Say cancel to stop.</string>
+    <string name="sos_sent">Your location has been sent. Calling now.</string>
+    <string name="sos_cancelled">Emergency cancelled.</string>
+
+    <!-- Never answer with silence. Silence reads as a broken device. -->
+    <string name="did_not_understand">I did not understand. Say help to hear what I can do.</string>
+    <string name="not_built_yet">That is not ready yet.</string>
+    <string name="offline_limited">I am offline. I can still warn you about obstacles and call for help.</string>
+    <string name="permission_needed">I need Bluetooth permission to reach the wearable. Please allow it in settings.</string>
+    <string name="confirmed">Done.</string>
+    <string name="language_now">I will speak English now.</string>
+    <string name="nothing_to_repeat">There is nothing to repeat yet.</string>
+
+    <!-- Listening -->
+    <string name="mic_permission_needed">I need microphone permission to listen. Please allow it in settings.</string>
+    <string name="asr_unavailable">Speech recognition is not available on this phone.</string>
+    <string name="did_not_hear">I did not hear anything. Tap and try again.</string>
+    <string name="asr_network">I need an internet connection to understand speech.</string>
+    <string name="asr_failed">I could not listen just now. Tap and try again.</string>
+
+    <!-- Reading -->
+    <string name="read_hold_steady">Hold the phone above the page and keep still.</string>
+    <string name="read_camera_permission_needed">I need camera permission to read. Please allow it in settings.</string>
+    <string name="read_capture_failed">I could not take the picture. Try again.</string>
+    <string name="read_no_text">I could not find readable text. Bangla pages are not supported yet.</string>
+    <string name="read_paused">Paused.</string>
+    <string name="read_finished">Finished reading.</string>
+    <string name="read_nothing_open">No page is open. Double tap to read one.</string>
+    <string name="read_open_app">Open the app to read a page.</string>
+
+    <string name="page_queued">Page captured. I will read it when you are back online.</string>
+</resources>

@@ -1,0 +1,21 @@
+# torch and torchvision come from the CUDA index first (see README).
+ultralytics
+opencv-python
+sounddevice
+soundfile
+onnx
+onnxruntime
+numpy
+scipy
+matplotlib
+pandas
+scikit-learn
+tqdm
+requests
+psutil
+pyyaml
+jupyterlab
+ipykernel
+ipywidgets
+nbformat
+nbconvert

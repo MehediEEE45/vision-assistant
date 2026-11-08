@@ -1,0 +1,54 @@
+id,en,bn
+BOOT,Vision Assistant ready.,ভিশন অ্যাসিস্ট্যান্ট চালু হয়েছে।
+RESTARTED,The device restarted.,যন্ত্রটি আবার চালু হয়েছে।
+NO_SENSOR,No distance sensor found. Obstacle warnings are off.,দূরত্ব সেন্সর পাওয়া যায়নি। বাধার সতর্কতা বন্ধ।
+SENSOR_FAULT,Distance sensor not responding. Obstacle warnings stopped.,দূরত্ব সেন্সর সাড়া দিচ্ছে না। বাধার সতর্কতা বন্ধ।
+SENSOR_BACK,Distance sensor working again.,দূরত্ব সেন্সর আবার কাজ করছে।
+OBST_AHEAD,Obstacle ahead.,সামনে বাধা।
+OBST_LEFT,Obstacle on the left.,বাম দিকে বাধা।
+OBST_RIGHT,Obstacle on the right.,ডান দিকে বাধা।
+VERY_CLOSE,Very close.,খুব কাছে।
+DIST_0_5,Half a metre.,আধা মিটার।
+DIST_1_0,One metre.,এক মিটার।
+DIST_1_5,One and a half metres.,দেড় মিটার।
+DIST_2_0,Two metres.,দুই মিটার।
+DIST_2_5,Two and a half metres.,আড়াই মিটার।
+DIST_3_0,Three metres.,তিন মিটার।
+DIST_3_5,Three and a half metres.,সাড়ে তিন মিটার।
+DIST_4_0,Four metres.,চার মিটার।
+ZONE_LEFT,Left.,বামে।
+ZONE_AHEAD,Ahead.,সামনে।
+ZONE_RIGHT,Right.,ডানে।
+NOTHING_FOUND,Nothing detected.,কিছু পাওয়া যায়নি।
+RANGE_ABOUT,Sensing range about,দেখার সীমা প্রায়
+BRIGHT_LIGHT,Bright light. Shorter range.,আলো বেশি। দেখার সীমা কমেছে।
+NORMAL_LIGHT,Normal light.,আলো স্বাভাবিক।
+WARNINGS_ON,Obstacle warnings on.,বাধার সতর্কতা চালু।
+WARNINGS_OFF,Obstacle warnings off.,বাধার সতর্কতা বন্ধ।
+LANG_BANGLA,Bangla.,বাংলা।
+LANG_ENGLISH,English.,ইংরেজি।
+BANGLA_MISSING,Bangla voice not recorded yet. Using English.,
+BATTERY_LOW,Battery low.,ব্যাটারি কম।
+BATTERY_GOOD,Battery level good.,ব্যাটারি ভালো আছে।
+BATTERY_UNKNOWN,Battery level not available.,ব্যাটারির তথ্য নেই।
+ALARM_ON,Emergency alarm. Press the button to stop.,জরুরি অ্যালার্ম। বন্ধ করতে বোতাম চাপুন।
+ALARM_OFF,Alarm stopped.,অ্যালার্ম বন্ধ।
+NOT_UNDERSTOOD,"Sorry, I did not understand.","দুঃখিত, বুঝতে পারিনি।"
+HELP,Press once to hear what is around you. Press twice to repeat. Hold for two seconds to change the language. Hold for four seconds for the emergency alarm.,একবার চাপলে আশেপাশে কী আছে শুনবেন। দুইবার চাপলে আবার শুনবেন। দুই সেকেন্ড চেপে ধরলে ভাষা বদলাবে। চার সেকেন্ড চেপে ধরলে জরুরি অ্যালার্ম বাজবে।
+HELP_VOICE,"Press once, then say a command after the tone.","একবার চাপুন, টোনের পরে কমান্ড বলুন।"
+OBJ_PERSON,Person.,মানুষ।
+OBJ_CHAIR,Chair.,চেয়ার।
+OBJ_DOOR,Door.,দরজা।
+OBJ_TABLE,Table.,টেবিল।
+OBJ_BOTTLE,Bottle.,বোতল।
+OBJ_TOILET,Toilet.,টয়লেট।
+OBJ_RICKSHAW,Rickshaw.,রিকশা।
+OBJ_CNG,Auto-rickshaw.,সিএনজি।
+SEARCHING_FOR,Searching for,খুঁজছি।
+TURN_SLOWLY,Turn slowly.,ধীরে ধীরে ঘুরুন।
+NOT_FOUND,not found.,পাওয়া যায়নি।
+SEARCH_STOPPED,Search stopped.,খোঁজা বন্ধ।
+FIND_MENU,Find. Press once for the next item. Press twice to search for it.,খোঁজা। পরের জিনিস শুনতে একবার চাপুন। খুঁজতে দুইবার চাপুন।
+NOTHING_RECOGNISED,No known object recognised.,চেনা কোনো জিনিস পাওয়া যায়নি।
+CAMERA_FAULT,Camera not responding.,ক্যামেরা সাড়া দিচ্ছে না।
+VISION_NOT_INSTALLED,Object recognition is not installed yet.,জিনিস চেনার মডেল এখনো ইনস্টল হয়নি।

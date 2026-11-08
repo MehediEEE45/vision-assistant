@@ -1,0 +1,35 @@
+# Phrases this application must never say.
+#
+# The app reports observations. It does not certify safety. A blind user who
+# steps into traffic because a phone told them it was clear is the outcome this
+# file exists to prevent, and the distinction is too easy to lose at 2am three
+# days before a demo — so it is a build failure, not a code-review note.
+#
+# Say:     "Traffic light detected." / "Vehicle approaching from your left."
+# Not:     "It is safe to cross."
+#
+# One phrase per line, lowercase, matched as a substring of any user-facing
+# string resource. Lines starting with # are comments.
+#
+# Checked by: ./gradlew checkSafetyLanguage
+
+safe to cross
+you can cross now
+it is safe
+it's safe
+clear to cross
+no cars
+nothing is coming
+the road is clear
+you may proceed
+go ahead safely
+নিরাপদে পার হন
+এখন পার হতে পারেন
+রাস্তা ফাঁকা
+কোন গাড়ি নেই
+নিরাপদ
+
+# Medication: read the label, never infer a dose.
+take two tablets
+the correct dose
+you should take
