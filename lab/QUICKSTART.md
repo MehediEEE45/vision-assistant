@@ -9,9 +9,12 @@ both systems. No Python source edits are needed when changing operating systems.
 Install Git and Python 3.11, then clone the laptop branch:
 
 ```bash
-git clone --branch rehan --single-branch https://github.com/MehediEEE45/vision-assistant.git
+git clone --branch rehan --single-branch https://github.com/RehanulBary/vision-assistant.git
 cd vision-assistant
 ```
+
+This is the laptop branch in RehanulBary's fork. The original Android/wearable
+repository is [MehediEEE45/vision-assistant](https://github.com/MehediEEE45/vision-assistant).
 
 On another computer, create its environment with the setup script below. A Mac
 `.venv` cannot be reused on Windows. The downloaded models are several GB; this
