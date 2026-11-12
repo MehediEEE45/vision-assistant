@@ -86,6 +86,8 @@ class Speaker:
         self._queue = []                   # utterances waiting their turn
         self._ready = []                   # synthesised on a worker, waiting to be offered
         self._pending = 0
+        self._generation = 0
+        self._prepare_lock = threading.Lock()
         import queue
         self._synth_q = queue.Queue()
         threading.Thread(target=self._synth_worker, daemon=True).start()
@@ -208,28 +210,45 @@ class Speaker:
         offered again: the camera loop never waits for a voice."""
         todo = self._needs_synthesis(u)
         # Hazards and turns are recorded prompts: they never wait in line.
-        if todo or (self._pending and u.priority >= ANSWER):
+        with self._prepare_lock:
+            generation = self._generation
+            prepare = todo or (self._pending and u.priority >= ANSWER)
+            if prepare:
+                self.status[u.id] = "preparing"
+                self._pending += 1
+                self._synth_q.put((generation, u, todo))
+        if prepare:
             # One worker, first in first out: sentences come out in the order
             # they were said, and a cached one never jumps ahead of a slow one.
-            self.status[u.id] = "preparing"
-            self._pending += 1
-            self._synth_q.put((u, todo))
             return u.id
         return self._offer(u)
 
     def _synth_worker(self):
         from . import tts
         while True:
-            u, todo = self._synth_q.get()
+            job = self._synth_q.get()
+            if job is None:
+                self._synth_q.task_done()
+                return
+            generation, u, todo = job
             try:
                 for text, lang in todo:
+                    if generation != self._generation:
+                        break
                     tts.synth(text, lang)
-                self._ready.append(u)
+                with self._prepare_lock:
+                    if generation == self._generation:
+                        self._ready.append(u)
+                    else:
+                        self.status[u.id] = "dropped"
             except Exception as e:
                 print("speech synthesis failed:", repr(e))
                 self.status[u.id] = "dropped"
             finally:
-                self._pending -= 1
+                with self._prepare_lock:
+                    if generation == self._generation:
+                        self._pending -= 1
+                self._synth_q.task_done()
 
     def _offer(self, u):
         playing = self.busy() and self._current is not None
@@ -263,9 +282,15 @@ class Speaker:
             self._start(self._queue.pop(0))
 
     def stop(self):
-        for u in self._ready:
-            self.status[u.id] = "dropped"
-        self._ready = []
+        with self._prepare_lock:
+            self._generation += 1
+            self._pending = 0
+            for uid, state in list(self.status.items()):
+                if state == "preparing":
+                    self.status[uid] = "dropped"
+            for u in self._ready:
+                self.status[u.id] = "dropped"
+            self._ready = []
         with self._lock:
             if self._current is not None and self._pos < len(self._speech):
                 self.status[self._current.id] = "cut"
@@ -317,5 +342,6 @@ class Speaker:
 
     def close(self):
         self.stop()
+        self._synth_q.put(None)
         self._stream.stop()
         self._stream.close()

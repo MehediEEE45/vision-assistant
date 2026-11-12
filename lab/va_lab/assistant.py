@@ -101,6 +101,8 @@ class Assistant:
         # Entered before it becomes current: the main loop never steps a
         # half-started mode.
         self.mode.exit()
+        self.speaker.stop()
+        self.stabiliser.reset()
         self.mode = Mode(self)
         mode.enter()
         if not mode.done:
@@ -134,8 +136,15 @@ class Assistant:
     def stop_all(self):
         self.alarm = False
         self.awaiting_find = False
+        self._listen_at = None
+        self.mic.stop()
+        if self.speech_in is not None:
+            self.speech_in.cancel()
+        was_active = self.mode.name != "idle"
+        self.idle()
         self.speaker.stop()
-        self.idle(announce_it=True)
+        if was_active:
+            self.say_key("mode_idle")
 
     def toggle_language(self, bangla=None):
         self.speaker.bangla = (not self.speaker.bangla) if bangla is None else bangla
@@ -418,8 +427,12 @@ def main():
     ap.add_argument("--kws", help="keyword model (default: models/kws_custom.pt, else kws_demo.pt)")
     ap.add_argument("--camera", type=int, default=config.CAMERA_INDEX)
     ap.add_argument("--english", action="store_true")
+    ap.add_argument("--camera-facing", choices=["user", "forward"], default="user",
+                    help="user = laptop webcam (warnings off); forward = outward-facing camera")
+    ap.add_argument("--max-seconds", type=float, help="Close automatically after this many seconds")
     args = ap.parse_args()
-    Assistant(args.detector, args.kws, args.camera, bangla=not args.english).run()
+    config.CAMERA_FACES_USER = args.camera_facing == "user"
+    Assistant(args.detector, args.kws, args.camera, bangla=not args.english).run(max_seconds=args.max_seconds)
 
 
 if __name__ == "__main__":

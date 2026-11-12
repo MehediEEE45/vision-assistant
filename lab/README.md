@@ -1,5 +1,10 @@
 # Vision Assistant lab: the wearable on a laptop
 
+**macOS and Windows setup on branch `rehan`: [QUICKSTART.md](QUICKSTART.md).**
+Use that guide for the project-local environment, model downloads, launchers,
+diagnostics and functional tests. The measured timings and original Windows
+environment recorded below describe the author's machine.
+
 The STM32H743 wearable's behaviour, run on a laptop: the webcam stands in for
 the OV5640, the built-in microphone for the INMP441, and the speakers for the
 MAX98357A. Left/right ticks in the speakers stand in for the vibration motors.

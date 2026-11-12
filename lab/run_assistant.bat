@@ -6,5 +6,9 @@ cd /d "%~dp0"
 set HF_HUB_OFFLINE=1
 set TRANSFORMERS_OFFLINE=1
 set YOLO_OFFLINE=True
-"%USERPROFILE%\.venvs\vision-ai-lab\Scripts\python.exe" -m va_lab.assistant %*
+if not exist "..\.venv\Scripts\python.exe" (
+    echo Run setup.bat --models first.
+    exit /b 1
+)
+"..\.venv\Scripts\python.exe" -m va_lab.assistant %*
 if errorlevel 1 pause

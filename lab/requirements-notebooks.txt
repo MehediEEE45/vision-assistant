@@ -1,0 +1,11 @@
+-r requirements.txt
+onnx
+onnxruntime
+matplotlib
+pandas
+scikit-learn
+jupyterlab
+ipykernel
+ipywidgets
+nbformat
+nbconvert

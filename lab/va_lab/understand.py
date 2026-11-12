@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 
 from . import config
+from .platform_support import torch_device
 
 # Base, not large, on a 4 GB GPU: 0.47 GB and 2.8 s for a detailed caption,
 # against 1.9 GB and ~8 s, with nearly the same captions (measured on this
@@ -86,7 +87,7 @@ def _load(name):
         return OCR()
     if name == "florence":
         from transformers import AutoProcessor, Florence2ForConditionalGeneration
-        dev = "cuda" if torch.cuda.is_available() else "cpu"
+        dev = torch_device()
         dtype = torch.float16 if dev == "cuda" else torch.float32
         proc = AutoProcessor.from_pretrained(FLORENCE)
         model = Florence2ForConditionalGeneration.from_pretrained(FLORENCE, torch_dtype=dtype).to(dev).eval()
@@ -97,9 +98,10 @@ def _load(name):
         tok_bn = AutoTokenizer.from_pretrained(NLLB, src_lang="ben_Beng")
         # GPU in fp16 when 1.4 GB is free: 0.55 s a sentence against 3.2 s on
         # the CPU, same translation (measured). Otherwise the CPU.
-        gpu = torch.cuda.is_available() and _free_gpu_gb() > 1.4
+        device = torch_device()
+        gpu = device == "cuda" and _free_gpu_gb() > 1.4
         model = AutoModelForSeq2SeqLM.from_pretrained(NLLB, torch_dtype=torch.float16 if gpu else torch.float32)
-        model = model.to("cuda" if gpu else "cpu").eval()
+        model = model.to("cuda" if gpu else ("mps" if device == "mps" else "cpu")).eval()
         return tok_en, tok_bn, model
     raise KeyError(name)
 

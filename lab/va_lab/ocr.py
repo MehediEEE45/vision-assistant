@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 
 from . import config, enhance
+from .platform_support import torch_device
 
 MODEL_DIR = config.MODELS / "easyocr"
 _SPLIT = re.compile(r"(?<=[.!?।])\s+")
@@ -21,8 +22,14 @@ class OCR:
     def __init__(self):
         import easyocr
         import torch
-        self.reader = easyocr.Reader(["bn", "en"], gpu=torch.cuda.is_available(),
+        device = torch_device()
+        self.reader = easyocr.Reader(["bn", "en"], gpu=False if device == "cpu" else device,
                                      model_storage_directory=str(MODEL_DIR), verbose=False)
+        # The Bengali recognizer covers Latin too, but confuses capital I/L/!
+        # on English pages. Reuse its boxes and refine uncertain Latin lines
+        # with the English recognizer; Bengali and mixed-script lines stay here.
+        self.english = easyocr.Reader(["en"], gpu=False if device == "cpu" else device,
+                                     model_storage_directory=str(MODEL_DIR), detector=False, verbose=False)
 
     def boxes(self, frame, width=640):
         """Fast text-box detection only, for aiming. [(x1, y1, x2, y2)] in frame pixels."""
@@ -43,6 +50,17 @@ class OCR:
         out = []
         for pts, text, conf in res:
             pts = np.asarray(pts)
+            if conf < 0.95 and not any("ঀ" <= c <= "৿" for c in text) and any(c.isascii() and c.isalpha() for c in text):
+                x1, y1 = np.maximum(0, np.floor(pts.min(axis=0)).astype(int) - 2)
+                x2, y2 = np.minimum((image.shape[1], image.shape[0]), np.ceil(pts.max(axis=0)).astype(int) + 2)
+                crop = image[y1:y2, x1:x2]
+                if crop.size:
+                    with gpu_job:
+                        candidates = self.english.recognize(crop, detail=1, paragraph=False)
+                    if candidates:
+                        _, english, score = max(candidates, key=lambda r: r[2])
+                        if english.strip() and score > conf:
+                            text, conf = english, score
             out.append(((float(pts[:, 0].min()), float(pts[:, 1].min()),
                          float(pts[:, 0].max()), float(pts[:, 1].max())), text.strip(), float(conf)))
         return [r for r in out if r[1]]

@@ -1,9 +1,7 @@
 """Caption images for the on-screen window, Bangla included.
 
-OpenCV cannot draw Bangla, and Pillow here has no complex-script shaping,
-so joined letters (যুক্তাক্ষর) would come out broken. As in the firmware's
-make_display_assets.py, Windows' own text engine renders every prompt once
-to a PNG; the window only pastes pixels.
+OpenCV cannot shape Bangla. Windows' text engine and macOS CoreText render
+the joined letters to image masks; the preview window only pastes pixels.
 """
 
 import json
@@ -45,8 +43,8 @@ foreach ($job in $spec.jobs) {
 def render_all(force=False):
     """Renders every prompt in both languages to models/captions/. Windows only."""
     if os.name != "nt":
-        print("captions need Windows' text engine; the window will show English text instead")
-        return 0
+        from .caption_renderer import render_all as render_portable
+        return render_portable(force=force)
     config.CAPTIONS_DIR.mkdir(parents=True, exist_ok=True)
     jobs = []
     for pid, text in config.load_prompts().items():
@@ -119,7 +117,10 @@ _thread = None
 def text_mask(text, lang):
     """Mask for arbitrary text; None until it has been rendered (in the background)."""
     global _thread
-    if os.name != "nt" or not text.strip():
+    if os.name != "nt":
+        from .caption_renderer import text_mask as portable_mask
+        return portable_mask(text, lang)
+    if not text.strip():
         return None
     out = config.CAPTIONS_DIR / f"txt_{lang}_{hashlib.sha1(text.encode('utf-8')).hexdigest()[:16]}.png"
     key = ("txt", str(out))

@@ -7,6 +7,37 @@ Obstacle warning, walking navigation, document reading and emergency help, in
 The full 26-week plan, with phase gates and the risk register, is in
 [`docs/plan.md`](docs/plan.md).
 
+## Laptop prototype: macOS and Windows
+
+The `rehan` branch includes a portable laptop prototype in [`lab/`](lab/):
+Read, Find, Describe and Identify, with Bangla/English speech and a webcam.
+Camera, native English speech, captions and compute selection adapt to the OS.
+
+Start with the **[laptop setup and testing guide](lab/QUICKSTART.md)**. It covers
+fresh clones, the project-local Python environment, model downloads, launchers,
+permissions, controls, troubleshooting and optional notebooks on both systems.
+The **[validation record](lab/VALIDATION.md)** distinguishes automated tests,
+offline model checks and hardware testing still to be completed.
+
+On macOS, from the repository root:
+
+```bash
+./lab/setup.command --dev --models
+./lab/run_assistant.command
+```
+
+On Windows, from `lab`:
+
+```bat
+setup.bat --dev --cpu --models
+run_assistant.bat
+```
+
+Downloaded models, environments and personal recordings are generated locally;
+they are not included in Git. Windows needs its own environment and downloads.
+The architecture and Android build instructions below describe the phone and
+wearable side of the project.
+
 ---
 
 ## The two rules everything else follows from
