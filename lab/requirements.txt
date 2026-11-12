@@ -1,21 +1,28 @@
-# torch and torchvision come from the CUDA index first (see README).
-ultralytics
-opencv-python
-sounddevice
-soundfile
-onnx
-onnxruntime
-numpy
-scipy
-matplotlib
-pandas
-scikit-learn
-tqdm
-requests
-psutil
-pyyaml
-jupyterlab
-ipykernel
-ipywidgets
-nbformat
-nbconvert
+# Runtime for macOS (Apple Silicon) and Windows. Python 3.11 recommended.
+# Optional notebooks/training packages: requirements-notebooks.txt.
+torch>=2.6,<3
+torchvision>=0.21,<1
+ultralytics>=8.3,<9
+opencv-python>=4.10,<5
+opencv-python-headless>=4.10,<5
+easyocr==1.7.2
+# Florence-2 is native in 4.57; keep the tested v4 API for NLLB and MMS.
+transformers>=4.57.1,<5
+faster-whisper>=1.1,<2
+ctranslate2>=4.6,<5
+sentencepiece>=0.2,<1
+sacremoses>=0.1,<1
+uroman>=1.3,<2
+sounddevice>=0.5,<1
+soundfile>=0.13,<1
+numpy>=1.26,<3
+scipy>=1.13,<2
+pillow>=11,<13
+tqdm>=4.66,<5
+requests>=2.32,<3
+psutil>=6,<8
+pyyaml>=6,<7
+comtypes>=1.4,<2; platform_system == "Windows"
+pyobjc-framework-Cocoa>=11,<13; platform_system == "Darwin"
+# YOLO-World's text encoder. The package named 'clip' on PyPI is unrelated.
+clip @ https://github.com/ultralytics/CLIP/archive/7ffa84b3bfa40c42ecc1c77147a855e69cb2dd40.zip

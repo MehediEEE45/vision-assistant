@@ -38,6 +38,10 @@ lab/**/.ipynb_checkpoints/
 weights/
 lab/weights/
 .kotlin/
+.venv/
+lab/.cache/
+lab/.pytest_cache/
+lab/test-results/
 
 # Personal documents: registration forms (phone, date of birth), submissions,
 # pitch decks. Kept on this computer, never published.

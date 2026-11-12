@@ -6,11 +6,11 @@ the wearable and the laptop use until a person records them; a human
 recording dropped into prompts/bn/ always wins (`overwrite=False`).
 
 Input: BanglaASR (Whisper-small fine-tuned on Bangla) for Bangla, and
-faster-whisper for English, on the GPU. Free speech becomes text, and
+faster-whisper for English, on CUDA when available and CPU otherwise. Free speech becomes text, and
 intent.route() turns text into an action, exactly as the phone app does
 with Android's recogniser.
 
-Both models download once (to the Hugging Face cache on C:) and then run
+Both models download once (to the project's Hugging Face cache) and then run
 with no network.
 """
 
@@ -21,6 +21,7 @@ from pathlib import Path
 import numpy as np
 
 from . import audio_io, config, intent
+from .platform_support import torch_device
 
 TTS_MODEL = "facebook/mms-tts-ben"
 # Whisper-small fine-tuned on Bangla (Common Voice), run through CTranslate2
@@ -32,6 +33,7 @@ ASR_MODEL_EN = "small"
 _tts = None
 _asr = None
 _tts_run = threading.Lock()  # one synthesis at a time: the model holds state (speaking_rate)
+_asr_run = threading.Lock()
 
 
 # ---------------------------------------------------------------- output --
@@ -49,7 +51,7 @@ def _load_tts_locked():
         from transformers import AutoTokenizer, VitsModel
         tok = AutoTokenizer.from_pretrained(TTS_MODEL)
         # GPU: 0.1 s for a 9 s sentence against 3 s on the CPU (measured); 0.16 GB.
-        model = VitsModel.from_pretrained(TTS_MODEL).to("cuda" if torch.cuda.is_available() else "cpu").eval()
+        model = VitsModel.from_pretrained(TTS_MODEL).to(torch_device()).eval()
         _tts = (tok, model, torch)
     return _tts
 
@@ -130,13 +132,10 @@ def ensure_ct2_bangla():
     out = config.MODELS / "banglaasr-ct2"
     if (out / "model.bin").exists() and (out / "tokenizer.json").exists():
         return out
-    import subprocess
-    import sys
+    from ctranslate2.converters import TransformersConverter
     from transformers import WhisperTokenizerFast
-    conv = Path(sys.executable).with_name("ct2-transformers-converter.exe")
-    subprocess.run([str(conv), "--model", ASR_MODEL_BN, "--output_dir", str(out), "--quantization",
-                    "int8_float32", "--copy_files", "tokenizer_config.json", "preprocessor_config.json",
-                    "--force"], check=True)
+    converter = TransformersConverter(ASR_MODEL_BN, copy_files=["tokenizer_config.json", "preprocessor_config.json"])
+    converter.convert(str(out), quantization="int8_float32", force=True)
     WhisperTokenizerFast.from_pretrained(ASR_MODEL_BN).save_pretrained(str(out))
     return out
 
@@ -147,7 +146,7 @@ def _load_asr_locked(language):
     if _asr is None or _asr[0] != key:
         import torch
         from faster_whisper import WhisperModel
-        cuda = torch.cuda.is_available()
+        cuda = torch_device() == "cuda"
         if key == "bn":
             _asr = (key, WhisperModel(str(ensure_ct2_bangla()), device="cuda" if cuda else "cpu",
                                       compute_type="int8"))
@@ -163,10 +162,11 @@ def transcribe(audio, language="bn"):
     No hint prompt: given the phrase list as a prompt, Whisper loops on it
     and invents commands, which is worse than a plain miss.
     """
-    asr = _load_asr(language)
-    segments, _ = asr.transcribe(np.asarray(audio, np.float32), language=language, beam_size=2,
-                                 vad_filter=True, condition_on_previous_text=False, without_timestamps=True)
-    return " ".join(seg.text.strip() for seg in segments).strip()
+    with _asr_run:
+        asr = _load_asr(language)
+        segments, _ = asr.transcribe(np.asarray(audio, np.float32), language=language, beam_size=2,
+                                     vad_filter=True, condition_on_previous_text=False, without_timestamps=True)
+        return " ".join(seg.text.strip() for seg in segments).strip()
 
 
 def listen_and_route(seconds=3.0, language="bn"):
@@ -186,6 +186,8 @@ class Listener:
         self.language = language
         self._result = None
         self._busy = False
+        self._generation = 0
+        self._lock = threading.Lock()
 
     @property
     def listening(self):
@@ -195,28 +197,40 @@ class Listener:
         self._result = None
         self.mic.start()
 
-    def _work(self, audio, language):
+    def cancel(self):
+        self.mic.stop()
+        with self._lock:
+            self._generation += 1
+            self._result = None
+            self._busy = False
+
+    def _work(self, audio, language, generation):
         try:
             text = transcribe(audio, language=language)
             it, detail = intent.route(text)
-            self._result = (it, detail, text)
+            result = (it, detail, text)
         except Exception as e:
             print("speech recognition failed:", repr(e))
-            self._result = ("unknown", None, "")
-        finally:
-            self._busy = False
+            result = ("unknown", None, "")
+        with self._lock:
+            if generation == self._generation:
+                self._result = result
+                self._busy = False
 
     def poll(self):
-        if self._result is not None:
-            r, self._result = self._result, None
-            return r
+        with self._lock:
+            if self._result is not None:
+                r, self._result = self._result, None
+                return r
         audio = self.mic.poll()
         if audio is None:
             return None
         if audio_io.dbfs(audio) < -45:
             return ("unknown", None, "")
-        self._busy = True
-        threading.Thread(target=self._work, args=(audio, self.language), daemon=True).start()
+        with self._lock:
+            self._busy = True
+            generation = self._generation
+        threading.Thread(target=self._work, args=(audio, self.language, generation), daemon=True).start()
         return None
 
 
@@ -224,4 +238,3 @@ def warm_up(language="bn"):
     """Loads the models now, so the first command does not wait for them."""
     _load_asr(language)
     _load_tts()
-

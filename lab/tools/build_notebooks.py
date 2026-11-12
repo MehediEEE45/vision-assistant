@@ -10,7 +10,7 @@ from pathlib import Path
 import nbformat as nbf
 
 NB_DIR = Path(__file__).resolve().parent.parent / "notebooks"
-KERNEL = {"name": "vision-ai-lab", "display_name": "Vision AI Lab (py3.11, CUDA)", "language": "python"}
+KERNEL = {"name": "vision-ai-lab", "display_name": "Vision Assistant (project)", "language": "python"}
 
 SETUP = """import sys, pathlib
 LAB = pathlib.Path.cwd().parent if pathlib.Path.cwd().name == "notebooks" else pathlib.Path.cwd()

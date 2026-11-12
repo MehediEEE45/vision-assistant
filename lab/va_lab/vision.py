@@ -16,6 +16,7 @@ from pathlib import Path
 import numpy as np
 
 from . import config
+from .platform_support import camera_backends, torch_device
 
 
 @dataclass
@@ -50,7 +51,7 @@ class Detector:
         from ultralytics import YOLO
         import torch
 
-        self.device = device or (0 if torch.cuda.is_available() else "cpu")
+        self.device = device or torch_device(allow_mps=True)
         self.conf = conf
         self.hfov = hfov_deg
         self.mode = mode
@@ -186,12 +187,14 @@ def _iou(a, b):
 def open_camera(index=config.CAMERA_INDEX, width=config.CAMERA_WIDTH, height=config.CAMERA_HEIGHT):
     import cv2
 
-    cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-    if not cap.isOpened():
-        raise RuntimeError(f"camera {index} did not open: is another program using it?")
-    return cap
+    for backend in camera_backends(cv2):
+        cap = cv2.VideoCapture(index, backend)
+        if cap.isOpened():
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            return cap
+        cap.release()
+    raise RuntimeError(f"Camera {index} could not open. Check camera permission, the index, and other apps using it.")
 
 
 def grab(cap, warmup=5):

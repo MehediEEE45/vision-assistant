@@ -1,6 +1,7 @@
 """Paths and tunables. Numbers shared with the firmware say where they come from."""
 
 import csv
+import os
 import threading
 from pathlib import Path
 
@@ -8,6 +9,13 @@ LAB = Path(__file__).resolve().parent.parent
 REPO = LAB.parent
 DATA = LAB / "data"
 MODELS = LAB / "models"
+
+# Keep downloads in this project; launchers and notebooks share these defaults.
+# Existing user overrides still take precedence.
+os.environ.setdefault("HF_HOME", str(LAB / ".cache" / "huggingface"))
+os.environ.setdefault("TORCH_HOME", str(LAB / ".cache" / "torch"))
+os.environ.setdefault("YOLO_CONFIG_DIR", str(LAB / ".cache" / "ultralytics"))
+os.environ.setdefault("YOLO_AUTOINSTALL", "false")
 
 FIRMWARE = REPO / "firmware" / "stm32h743"
 PROMPTS_CSV = FIRMWARE / "tools" / "prompts.csv"

@@ -1,5 +1,5 @@
 """Speech for arbitrary text, offline: Bangla with MMS-TTS, English with the
-Windows voice. Used for what no recorded prompt can cover: text read from a
+native OS voice. Used for what no recorded prompt can cover: text read from a
 page, a description, an object's name.
 
 Results are cached in memory and on disk (models/tts_cache), so a phrase is
@@ -31,26 +31,10 @@ def is_bangla(text):
 
 
 def _english(text):
-    """Windows SAPI to a 16 kHz WAV, in-process. Offline."""
-    import comtypes
-    import comtypes.client
-    comtypes.CoInitialize()
-    try:
-        voice = comtypes.client.CreateObject("SAPI.SpVoice")
-        from comtypes.gen import SpeechLib
-        stream = comtypes.client.CreateObject("SAPI.SpFileStream")
-        fmt = comtypes.client.CreateObject("SAPI.SpAudioFormat")
-        fmt.Type = SpeechLib.SAFT16kHz16BitMono
-        stream.Format = fmt
-        with tempfile.TemporaryDirectory() as tmp:
-            path = str(Path(tmp) / "en.wav")
-            stream.Open(path, SpeechLib.SSFMCreateForWrite)
-            voice.AudioOutputStream = stream
-            voice.Speak(text)
-            stream.Close()
-            x = audio_io.load_wav(path)
-    finally:
-        comtypes.CoUninitialize()
+    """Native offline English voice, rendered before entering the mixer."""
+    from .platform_support import english_audio_file
+    with tempfile.TemporaryDirectory() as tmp:
+        x = audio_io.load_wav(english_audio_file(text, tmp))
     peak = float(np.max(np.abs(x))) if len(x) else 1.0
     return (x / (peak or 1.0) * 0.9).astype(np.float32)
 
@@ -78,14 +62,15 @@ def synth(text, lang=None):
         if key in _mem:
             return _mem[key]
     path = CACHE_DIR / f"{lang}_{hashlib.sha1(text.encode('utf-8')).hexdigest()[:16]}.wav"
-    if path.exists():
-        x = audio_io.load_wav(path)
-    else:
+    x = audio_io.load_wav(path) if path.exists() else None
+    if x is None or not len(x) or not np.isfinite(x).all() or not np.any(x):
         if lang == "bn":
             from . import bangla_voice
             x = bangla_voice.synthesize(text)
         else:
             x = _english(text)
+        if not len(x) or not np.isfinite(x).all() or not np.any(x):
+            raise RuntimeError("The speech engine returned silent audio. Check the installed voice and OS speech permissions.")
         audio_io.save_wav(path, x)
     with _lock:
         _mem[key] = x

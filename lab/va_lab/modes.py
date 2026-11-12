@@ -30,6 +30,8 @@ class Mode:
     def __init__(self, app):
         self.app = app
         self.done = False
+        self._cancelled = threading.Event()
+        self._output_lock = threading.RLock()
 
     # helpers
     @property
@@ -37,12 +39,21 @@ class Mode:
         return self.app.speaker.bangla
 
     def say_key(self, key, priority=ANSWER, tag=""):
+        if self._cancelled.is_set():
+            return None
         bn, en = phrases.P[key]
-        return self.app.speaker.say(Utterance(priority, [("text", bn, en)], tag=tag or key))
+        return self._say(Utterance(priority, [("text", bn, en)], tag=tag or key))
+
+    def _say(self, utterance):
+        with self._output_lock:
+            if not self._cancelled.is_set():
+                return self.app.speaker.say(utterance)
 
     def say_text(self, bn, en, priority=ANSWER, tag=""):
         """Speaks generated text sentence by sentence, so the first sentence
         starts while the rest are still being synthesised."""
+        if self._cancelled.is_set():
+            return None
         bn, en = safety.clean(bn), safety.clean(en)
         bs, es = safety.sentences(bn), safety.sentences(en)
         if not (bs if self.bangla else es):
@@ -50,10 +61,12 @@ class Mode:
         n = max(len(bs), len(es))
         uid = None
         for i in range(n):
+            if self._cancelled.is_set():
+                break
             b = bs[i] if i < len(bs) else ""
             e = es[i] if i < len(es) else ""
             if (b if self.bangla else e).strip():
-                uid = self.app.speaker.say(Utterance(priority, [("text", b, e)], tag=f"{tag}{i}" if tag else ""))
+                uid = self._say(Utterance(priority, [("text", b, e)], tag=f"{tag}{i}" if tag else ""))
         return uid
 
     def run_async(self, fn):
@@ -62,7 +75,8 @@ class Mode:
                 fn()
             except Exception as e:  # a failed model must not kill the assistant
                 print("mode error:", repr(e))
-                self.app.speaker.say(Utterance(ANSWER, [("tone", "error"), "CAMERA_FAULT"]))
+                if not self._cancelled.is_set():
+                    self._say(Utterance(ANSWER, [("tone", "error"), "CAMERA_FAULT"]))
                 self.done = True
         threading.Thread(target=wrap, daemon=True).start()
 
@@ -74,7 +88,9 @@ class Mode:
         pass
 
     def exit(self):
-        pass
+        with self._output_lock:
+            self._cancelled.set()
+            self.done = True
 
     def on_intent(self, it, detail):
         return False
@@ -151,6 +167,8 @@ class ReadMode(Mode):
 
         def work():
             res = understand.get("ocr").read(frame)
+            if self._cancelled.is_set():
+                return
             paras = reading_order(res)
             self.sentences = [(pi, s) for pi, p in enumerate(paras) for s in sentences(p)]
             if not self.sentences:
@@ -174,7 +192,18 @@ class ReadMode(Mode):
                 return
             while i > self.idx + 3 and not self.done:
                 time.sleep(0.1)
-            self.audio[i] = tts.synth(s)
+            if self._cancelled.is_set():
+                return
+            try:
+                audio = tts.synth(s)
+            except Exception as e:
+                print("reading synthesis failed:", repr(e))
+                if not self._cancelled.is_set():
+                    self.say_key("read_none")
+                    self.done = True
+                return
+            if not self._cancelled.is_set():
+                self.audio[i] = audio
 
     def _advance(self):
         sp = self.app.speaker
@@ -191,6 +220,7 @@ class ReadMode(Mode):
         if self.idx >= len(self.sentences):
             self.state = "finished"
             self.say_key("read_done")
+            self.done = True
             return
         if self.idx not in self.audio:
             return  # still synthesising
@@ -230,7 +260,7 @@ class ReadMode(Mode):
             self._jump_paragraph(0)
             return True
         if it == "read":
-            self.enter()  # a new page
+            self.app.set_mode(ReadMode(self.app))
             return True
         return False
 
@@ -239,7 +269,7 @@ class ReadMode(Mode):
                                ",": "previous", "r": "read"}.get(ch, ""), None)
 
     def exit(self):
-        self.done = True
+        super().exit()
 
     def status(self):
         if self.state == "reading":
@@ -320,6 +350,7 @@ class FindMode(Mode):
         self.side = side
 
     def exit(self):
+        super().exit()
         self.app.detector.restore()
 
     def status(self):
@@ -369,10 +400,14 @@ class DescribeMode(Mode):
             if where_bn:
                 self.say_text(where_bn, where_en, tag="describe")
             cap_en = understand.caption(frame, "detailed")
+            if self._cancelled.is_set():
+                return
             print("caption:", cap_en)
             # Translated and spoken a sentence at a time: the first is heard
             # while the next is still being translated.
             for i, sent in enumerate(safety.sentences(cap_en)):
+                if self._cancelled.is_set():
+                    return
                 self.say_text(understand.to_bangla(sent) if self.bangla else "", sent, tag=f"describe{i}_")
             if dark:
                 self.say_key("low_light", tag="describe3")
@@ -423,8 +458,12 @@ class IdentifyMode(Mode):
 
     def _identify(self, crop, target):
         cap_en = understand.caption(crop, "short").rstrip(".")
+        if self._cancelled.is_set():
+            return
         colour = understand.colour_name(crop)
         res = understand.get("ocr").read(crop)
+        if self._cancelled.is_set():
+            return
         text = " ".join(t for _, t, c in res if c > 0.3)
         cap_bn = understand.to_bangla(cap_en) if self.bangla else ""
         c_bn, c_en = phrases.COLOURS[colour]
@@ -460,4 +499,3 @@ class IdentifyMode(Mode):
 
     def status(self):
         return f"IDENTIFY: {self.state}"
-

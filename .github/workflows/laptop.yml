@@ -1,0 +1,33 @@
+name: Laptop prototype
+
+on:
+  push:
+    branches: [main, rehan]
+    paths: ['lab/**', '.github/workflows/laptop.yml']
+  pull_request:
+    paths: ['lab/**', '.github/workflows/laptop.yml']
+
+jobs:
+  laptop-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: lab/requirements*.txt
+      - name: Install runtime and tests
+        run: python lab/tools/setup_lab.py --dev --cpu
+      - name: Test without devices or model downloads
+        working-directory: lab
+        run: ../.venv/bin/python -m pytest
+        if: runner.os != 'Windows'
+      - name: Test Windows adapters without devices or model downloads
+        working-directory: lab
+        run: ../.venv/Scripts/python.exe -m pytest
+        if: runner.os == 'Windows'
